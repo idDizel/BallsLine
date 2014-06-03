@@ -3,6 +3,9 @@ using System.Collections;
 using GameLevel;
 using Game1;
 using System.Linq;
+using BallsLine.Implementation;
+using System.Collections.Generic;
+using BallsLine.Entities;
 
 public class GameState : MonoBehaviour {
 
@@ -11,22 +14,24 @@ public class GameState : MonoBehaviour {
     Ray ray;
     RaycastHit hit;
     Transform selectedBall;
+    LevelState levelState;
 
 	// Use this for initialization
 	void Start () {
+        this.levelState = LevelState.Instance;
         core = new Core();
-        this.UpdateState();
+        
 	}
 	
-    void UpdateState()
+    void UpdateState(IEnumerable<BallEntity> balls)
     {
-        foreach(var a in core.Generate())
+        foreach(var a in balls)
         {
-            Transform el = (Transform)Instantiate(ball, new Vector3(a.X * 1.1f, a.Y * 1.1f, -1), Quaternion.identity);
-            el.renderer.material.color = core.ColorTransformer(core.LevelArray[a.X, a.Y]);
-            el.GetComponent<Values>().X = a.X;
-            el.GetComponent<Values>().Y = a.Y;
-            el.GetComponent<Values>().cellType = core.LevelArray[a.X, a.Y];
+            Transform el = (Transform)Instantiate(ball, new Vector3(a.BallPosition.X * 1.1f, a.BallPosition.Y * 1.1f, -1), Quaternion.identity);
+            el.renderer.material.color = core.ColorTransformer((CellType)a.BallType);
+            el.GetComponent<Values>().X = a.BallPosition.X;
+            el.GetComponent<Values>().Y = a.BallPosition.Y;
+            el.GetComponent<Values>().cellType = (CellType)a.BallType;
         }
     }
 	// Update is called once per frame
@@ -35,8 +40,8 @@ public class GameState : MonoBehaviour {
 
 	    if(Input.GetKeyDown(KeyCode.Space))
         {
+            this.levelState.GenerateBalls(this.UpdateState);
             
-            UpdateState();
         }
         if (Input.GetMouseButtonDown(0))
         {
@@ -88,7 +93,7 @@ public class GameState : MonoBehaviour {
                                 Destroy(desEl);
                             }
                         }
-                        if(clearList.Count()==0) this.UpdateState();
+                        //if(clearList.Count()==0) this.UpdateState();
                         this.selectedBall = null;
                     }
                 }
