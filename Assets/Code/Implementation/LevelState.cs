@@ -97,7 +97,7 @@ namespace BallsLine.Implementation
         {
             if(this.selectedBall!=null)
             {
-                this.core.ChangePosition(newPosition, selectedBall);
+                this.core.ChangePosition(newPosition);
             }
         }
     }

@@ -82,7 +82,7 @@ namespace BallsLine.Implementation
             return null;
         }
 
-        public void ChangePosition(Position newPosition, GameObject selectedBall)
+        public void ChangePosition(Position newPosition)
         {
             if(!this.LevelGrid.ContainsKey(newPosition))
             {
