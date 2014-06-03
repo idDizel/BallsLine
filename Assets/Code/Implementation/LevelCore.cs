@@ -12,12 +12,27 @@ namespace BallsLine.Implementation
 {
     public class LevelCore: ILevelCore, IPrefabMapping
     {
-        private GameObject selectedBall;
         private Dictionary<Position, BallType> LevelGrid;
         private Dictionary<BallType, GameObject> mappedPrefabs;
 
         private int levelXSize;
         private int levelYSize;
+
+        public int LevelXSize
+        {
+            get
+            {
+                return this.levelXSize;
+            }
+        }
+
+        public int LevelYSize
+        {
+            get
+            {
+                return this.levelYSize;
+            }
+        }
 
         public int LevelSize
         {
@@ -43,19 +58,7 @@ namespace BallsLine.Implementation
             this.mappedPrefabs = new Dictionary<BallType, GameObject>();
         }
 
-        public GameObject SelectedBall
-        {
-            get
-            {
-                return this.selectedBall;
-            }
-            set
-            {
-                this.selectedBall = value;
-            }
-        }
-
-        public IEnumerable<BallEntity> Generate(int ballsCount)
+        public IEnumerable<BallEntity> GenerateBalls(int ballsCount)
         {
             int count = 0;
             bool finish = false;
@@ -79,9 +82,12 @@ namespace BallsLine.Implementation
             return null;
         }
 
-        public void ChangePosition(int newX, int newY)
+        public void ChangePosition(Position newPosition, GameObject selectedBall)
         {
-            throw new NotImplementedException();
+            if(!this.LevelGrid.ContainsKey(newPosition))
+            {
+                //TODO.....
+            }
         }
 
         public void MapPrefab(GameObject gameObject, BallType type)

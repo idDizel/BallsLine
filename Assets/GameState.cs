@@ -17,12 +17,15 @@ public class GameState : MonoBehaviour {
     public GameObject BlueBall;
     public GameObject PurpleBall;
     public GameObject OrangeBall;
+    public GameObject Cell;
+
     private GameObject Ball;
 
 	// Use this for initialization
 	void Start () {
         this.levelState = LevelState.Instance;
         this.levelState.GenerateLevel();
+        this.levelState.GenerateCells(Cell);
         
         this.levelState.MapPrefab(RedBall, BallType.Red);
         this.levelState.MapPrefab(BlueBall, BallType.Blue);

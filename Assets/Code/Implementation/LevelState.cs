@@ -33,9 +33,22 @@ namespace BallsLine.Implementation
             }
         }
 
+        public void GenerateCells(GameObject cellInstance)
+        {
+            for (int x = 0; x < this.core.LevelXSize; x++)
+            {
+                for (int y = 0; y < this.core.LevelYSize; y++)
+                {
+                    GameObject newCell = (GameObject)GameObject.Instantiate(cellInstance, new Vector3(x * 1.1f, y * 1.1f, 0), Quaternion.identity);
+                    newCell.GetComponent<CellBehaviour>().position.X = x;
+                    newCell.GetComponent<CellBehaviour>().position.Y = y;
+                }
+            }
+        }
+
         public void GenerateBalls()
         {
-            foreach (var ball in core.Generate(3))
+            foreach (var ball in core.GenerateBalls(3))
             {
                 this.core.GetBallByType(ball.BallType, out ballInstanse);
                 ball.gameObject = (GameObject)GameObject.Instantiate(ballInstanse, new Vector3(ball.BallPosition.X * 1.1f, ball.BallPosition.Y * 1.1f, -1), Quaternion.identity);
@@ -77,6 +90,14 @@ namespace BallsLine.Implementation
             {
                 this.selectedBall = selectedBall.gameObject;
                 this.selectedBall.transform.Translate(new Vector3(0, 0, -1.0f));
+            }
+        }
+
+        public void ChangePosition(Position newPosition)
+        {
+            if(this.selectedBall!=null)
+            {
+                this.core.ChangePosition(newPosition, selectedBall);
             }
         }
     }

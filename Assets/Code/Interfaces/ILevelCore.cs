@@ -10,7 +10,7 @@ namespace BallsLine.Interfaces
     public interface ILevelCore
     {
         GameObject SelectedBall { get; set; }
-        IEnumerable<BallEntity> Generate(int ballsCount);
+        IEnumerable<BallEntity> GenerateBalls(int ballsCount);
         IEnumerable<Position> ValidateLines(BallEntity ball);
         void ChangePosition(int newX, int newY);
     }

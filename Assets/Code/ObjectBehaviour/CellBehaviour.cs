@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using BallsLine.Entities;
+using BallsLine.Implementation;
 
 public class CellBehaviour : MonoBehaviour {
+    [HideInInspector]
+    public Position position;
 	// Use this for initialization
 	void Start () {
 	
@@ -9,6 +13,6 @@ public class CellBehaviour : MonoBehaviour {
 
     void OnMouseDown()
     {
-        //Debug.Log(string.Format("Cell  {0} {1}", X, Y));
+        LevelState.Instance.ChangePosition(position);
     }
 }
