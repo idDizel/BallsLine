@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BallsLine.Enums;
+﻿using BallsLine.Enums;
+using UnityEngine;
 
 namespace BallsLine.Entities
 {
@@ -15,5 +12,6 @@ namespace BallsLine.Entities
         }
         public Position BallPosition { get; set; }
         public BallType BallType { get; set; }
+        public GameObject gameObject { get; set; }
     }
 }

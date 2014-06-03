@@ -1,17 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CellValues : MonoBehaviour {
-    public int X;
-    public int Y;
-
+public class CellBehaviour : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
 	
 	}
 

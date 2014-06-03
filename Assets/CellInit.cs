@@ -12,8 +12,6 @@ public class CellInit : MonoBehaviour {
             for (int y = 0; y < 7; y++)
             {
                 Transform obj = (Transform)Instantiate(brick, new Vector3(x*1.1f, y*1.1f, 0), Quaternion.identity);
-                obj.GetComponent<CellValues>().X = x;
-                obj.GetComponent<CellValues>().Y = y;
             }
         }
 	}
