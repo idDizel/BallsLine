@@ -6,13 +6,15 @@ using BallsLine.Interfaces;
 using BallsLine.Entities;
 using BallsLine.Enums;
 using UnityEngine;
+using UnityEditor;
 
 namespace BallsLine.Implementation
 {
-    public class LevelCore: ILevelCore
+    public class LevelCore: ILevelCore, IPrefabMapping
     {
         private GameObject selectedBall;
         private Dictionary<Position, BallType> LevelGrid;
+        private Dictionary<BallType, GameObject> mappedPrefabs;
 
         private int levelXSize;
         private int levelYSize;
@@ -38,6 +40,7 @@ namespace BallsLine.Implementation
             this.levelXSize = lvlSize;
             this.levelYSize = lvlSize;
             this.LevelGrid = new Dictionary<Position, BallType>();
+            this.mappedPrefabs = new Dictionary<BallType, GameObject>();
         }
 
         public GameObject SelectedBall
@@ -79,6 +82,16 @@ namespace BallsLine.Implementation
         public void ChangePosition(int newX, int newY)
         {
             throw new NotImplementedException();
+        }
+
+        public void MapPrefab(GameObject gameObject, BallType type)
+        {
+            this.mappedPrefabs.Add(type, gameObject);
+        }
+
+        public void GetBallByType(BallType type, out GameObject gameObject)
+        {
+            this.mappedPrefabs.TryGetValue(type, out gameObject);
         }
     }
 }
