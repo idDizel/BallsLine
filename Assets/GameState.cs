@@ -1,8 +1,11 @@
 ﻿using BallsLine.Entities;
+using BallsLine.Entities;
+using BallsLine.Enums;
 using BallsLine.Enums;
 using BallsLine.Implementation;
 using System.Collections.Generic;
 using UnityEngine;
+
 
 public class GameState : MonoBehaviour {
 
@@ -28,11 +31,7 @@ public class GameState : MonoBehaviour {
         this.levelState.MapPrefab(OrangeBall, BallType.Orange);
         this.levelState.MapPrefab(PurpleBall, BallType.Purple);
 	}
-	
-    void UpdateState(IEnumerable<BallEntity> balls)
-    {
-       
-    }
+
 	// Update is called once per frame
 	void Update () {
         
