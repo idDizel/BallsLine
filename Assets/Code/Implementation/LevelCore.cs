@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BallsLine.Interfaces;
+﻿using BallsLine.Code.Implementation;
 using BallsLine.Entities;
 using BallsLine.Enums;
+using BallsLine.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEditor;
-using BallsLine.Code.Implementation;
 
 namespace BallsLine.Implementation
 {
