@@ -12,6 +12,5 @@ namespace BallsLine.Entities
         }
         public Position BallPosition { get; set; }
         public BallType BallType { get; set; }
-        public GameObject gameObject { get; set; }
     }
 }

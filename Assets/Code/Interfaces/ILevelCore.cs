@@ -11,6 +11,6 @@ namespace BallsLine.Interfaces
     {
         IEnumerable<BallEntity> GenerateBalls(int ballsCount);
         IEnumerable<Position> ValidateLines(BallEntity ball);
-        void ChangePosition(Position newPosition);
+        void ChangePosition(Position newPosition, Position prevPosition);
     }
 }

@@ -1,4 +1,5 @@
-﻿using BallsLine.Entities;
+﻿using BallsLine.Code.Implementation;
+using BallsLine.Entities;
 using BallsLine.Enums;
 using System;
 using System.Collections.Generic;
@@ -51,13 +52,16 @@ namespace BallsLine.Implementation
             foreach (var ball in core.GenerateBalls(3))
             {
                 this.core.GetBallByType(ball.BallType, out ballInstanse);
-                ball.gameObject = (GameObject)GameObject.Instantiate(ballInstanse, new Vector3(ball.BallPosition.X * 1.1f, ball.BallPosition.Y * 1.1f, -1), Quaternion.identity);
+                var newBall = (GameObject)GameObject.Instantiate(ballInstanse, new Vector3(ball.BallPosition.X * 1.1f, ball.BallPosition.Y * 1.1f, -1), Quaternion.identity);
+                newBall.GetComponent<BallBehaviour>().position.X = ball.BallPosition.X;
+                newBall.GetComponent<BallBehaviour>().position.Y = ball.BallPosition.Y;
             }
         }
 
         public void GenerateLevel()
         {
             this.core = new LevelCore(7);
+            this.core.OnPositionChanged += this.MoveBall;
         }
 
         public void MapPrefab(GameObject go, BallType type)
@@ -97,8 +101,17 @@ namespace BallsLine.Implementation
         {
             if(this.selectedBall!=null)
             {
-                this.core.ChangePosition(newPosition);
+                Position prevPosition = this.selectedBall.GetComponent<BallBehaviour>().position;
+                this.core.ChangePosition(newPosition, prevPosition);
             }
+        }
+
+        public void MoveBall(object sender, PositionEventArgs newPosition)
+        {
+            this.selectedBall.transform.position = new Vector3(newPosition.position.X * 1.1f, newPosition.position.Y * 1.1f, -1);
+            this.selectedBall.GetComponent<BallBehaviour>().position.X = newPosition.position.X;
+            this.selectedBall.GetComponent<BallBehaviour>().position.Y = newPosition.position.Y;
+            this.selectedBall = null;
         }
     }
 }

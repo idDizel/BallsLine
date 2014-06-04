@@ -7,6 +7,7 @@ using BallsLine.Entities;
 using BallsLine.Enums;
 using UnityEngine;
 using UnityEditor;
+using BallsLine.Code.Implementation;
 
 namespace BallsLine.Implementation
 {
@@ -14,9 +15,10 @@ namespace BallsLine.Implementation
     {
         private Dictionary<Position, BallType> LevelGrid;
         private Dictionary<BallType, GameObject> mappedPrefabs;
-
         private int levelXSize;
         private int levelYSize;
+
+        public EventHandler<PositionEventArgs> OnPositionChanged;
 
         public int LevelXSize
         {
@@ -82,11 +84,15 @@ namespace BallsLine.Implementation
             return null;
         }
 
-        public void ChangePosition(Position newPosition)
+        public void ChangePosition(Position newPosition, Position prevPosition)
         {
+            BallType prevBallType;
+            this.LevelGrid.TryGetValue(prevPosition, out prevBallType);
             if(!this.LevelGrid.ContainsKey(newPosition))
             {
-                //TODO.....
+                this.LevelGrid.Add(newPosition, prevBallType);
+                this.LevelGrid.Remove(prevPosition);
+                this.OnPositionChanged(this, new PositionEventArgs(newPosition));
             }
         }
 
