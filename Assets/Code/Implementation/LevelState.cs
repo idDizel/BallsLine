@@ -62,6 +62,7 @@ namespace BallsLine.Implementation
         {
             this.core = new LevelCore(7);
             this.core.OnPositionChanged += this.MoveBall;
+            this.core.OnBallDelete += this.BallDelete;
         }
 
         public void MapPrefab(GameObject go, BallType type)
@@ -106,12 +107,27 @@ namespace BallsLine.Implementation
             }
         }
 
-        public void MoveBall(object sender, PositionEventArgs newPosition)
+        public void MoveBall(object sender, PositionEventArgs args)
         {
-            this.selectedBall.transform.position = new Vector3(newPosition.position.X * 1.1f, newPosition.position.Y * 1.1f, -1);
-            this.selectedBall.GetComponent<BallBehaviour>().position.X = newPosition.position.X;
-            this.selectedBall.GetComponent<BallBehaviour>().position.Y = newPosition.position.Y;
+            this.selectedBall.transform.position = new Vector3(args.position.X * 1.1f, args.position.Y * 1.1f, -1);
+            this.selectedBall.GetComponent<BallBehaviour>().position.X = args.position.X;
+            this.selectedBall.GetComponent<BallBehaviour>().position.Y = args.position.Y;
+            if(!this.core.ValidateOfAxis(new Position(args.position.X, args.position.Y)))
+            {
+                this.GenerateBalls();
+            }
             this.selectedBall = null;
+        }
+
+        private void BallDelete(object sender, PositionListEventArgs args)
+        {
+            foreach (var element in args.Positions)
+            {
+                foreach (var desEl in GameObject.FindGameObjectsWithTag("Ball").Where(x => x.GetComponent<BallBehaviour>().position.X == element.X && x.GetComponent<BallBehaviour>().position.Y == element.Y))
+                {
+                    GameObject.Destroy(desEl);
+                }
+            }
         }
     }
 }

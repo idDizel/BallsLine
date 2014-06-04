@@ -3,7 +3,6 @@ using BallsLine.Implementation;
 using BallsLine.Entities;
 
 public class BallBehaviour : MonoBehaviour {
-
     [HideInInspector]
     public Position position;
 	// Use this for initialization

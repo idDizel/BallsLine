@@ -19,6 +19,7 @@ namespace BallsLine.Implementation
         private int levelYSize;
 
         public EventHandler<PositionEventArgs> OnPositionChanged;
+        public EventHandler<PositionListEventArgs> OnBallDelete;
 
         public int LevelXSize
         {
@@ -67,6 +68,7 @@ namespace BallsLine.Implementation
             do
             {
                 System.Random rnd = new System.Random();
+                //To do: optimize randomizer
                 Position position = new Position(rnd.Next(0, this.levelXSize), rnd.Next(0, this.levelYSize));
                 if(!this.LevelGrid.ContainsKey(position))
                 {
@@ -79,10 +81,36 @@ namespace BallsLine.Implementation
             } while (!finish);
         }
 
-        public IEnumerable<Position> ValidateLines(BallEntity ball)
+        public bool ValidateOfAxis(Position position)
         {
-            return null;
+            List<Position> validList = new List<Position>();
+            BallType ballType;
+            this.LevelGrid.TryGetValue(position, out ballType);
+
+            var axisArrayX = this.LevelGrid.Where(val => val.Key.X == position.X && val.Value == ballType).Select(val => val.Key.Y).OrderBy(val=>val).ToArray();
+            int offsetX = position.Y - Array.IndexOf(axisArrayX, position.Y);
+            var validX = axisArrayX.Where(val => val - Array.IndexOf(axisArrayX, val) == offsetX).Select(val => new Position(position.X, val)).ToList();
+
+            var axisArrayY = this.LevelGrid.Where(val => val.Key.Y == position.Y && val.Value == ballType).Select(val => val.Key.X).OrderBy(val=>val).ToArray();
+            int offsetY = position.X - Array.IndexOf(axisArrayY, position.X);
+            var validY = axisArrayY.Where(val => val - Array.IndexOf(axisArrayY, val) == offsetY).Select(val => new Position(val, position.Y)).ToList();
+
+            //To do: refactor constants
+            if (validX.Count >= 5) validList.AddRange(validX);
+            if (validY.Count >= 5) validList.AddRange(validY);
+
+            if (validList.Count > 0)
+            {
+                this.OnBallDelete(this, new PositionListEventArgs(validList.Distinct().ToList()));
+                foreach (var delBall in validList.Distinct())
+                {
+                    this.LevelGrid.Remove(delBall);
+                }
+                return true;
+            }
+            return false;
         }
+
 
         public void ChangePosition(Position newPosition, Position prevPosition)
         {
