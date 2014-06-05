@@ -62,8 +62,8 @@ namespace BallsLine.Implementation
             {
                 this.core.GetBallByType(ball.BallType, out ballInstanse);
                 var newBall = (GameObject)GameObject.Instantiate(ballInstanse, new Vector3(ball.BallPosition.X * 1.1f, ball.BallPosition.Y * 1.1f, -1), Quaternion.identity);
-                newBall.GetComponent<BallBehaviour>().position.X = ball.BallPosition.X;
-                newBall.GetComponent<BallBehaviour>().position.Y = ball.BallPosition.Y;
+                newBall.GetComponent<BallBehaviour>().Position.X = ball.BallPosition.X;
+                newBall.GetComponent<BallBehaviour>().Position.Y = ball.BallPosition.Y;
             }
         }
 
@@ -117,7 +117,7 @@ namespace BallsLine.Implementation
         {
             if(this.selectedBall!=null)
             {
-                Position prevPosition = this.selectedBall.GetComponent<BallBehaviour>().position;
+                Position prevPosition = this.selectedBall.GetComponent<BallBehaviour>().Position;
                 this.core.ChangePosition(newPosition, prevPosition);
             }
         }
@@ -125,8 +125,8 @@ namespace BallsLine.Implementation
         public void MoveBall(object sender, PositionEventArgs args)
         {
             this.selectedBall.transform.position = new Vector3(args.position.X * 1.1f, args.position.Y * 1.1f, -1);
-            this.selectedBall.GetComponent<BallBehaviour>().position.X = args.position.X;
-            this.selectedBall.GetComponent<BallBehaviour>().position.Y = args.position.Y;
+            this.selectedBall.GetComponent<BallBehaviour>().Position.X = args.position.X;
+            this.selectedBall.GetComponent<BallBehaviour>().Position.Y = args.position.Y;
             if(!this.core.ValidateOfAxis(new Position(args.position.X, args.position.Y)))
             {
                 this.GenerateBalls();
@@ -138,7 +138,7 @@ namespace BallsLine.Implementation
         {
             foreach (var element in args.Positions)
             {
-                foreach (var desEl in GameObject.FindGameObjectsWithTag("Ball").Where(x => x.GetComponent<BallBehaviour>().position.X == element.X && x.GetComponent<BallBehaviour>().position.Y == element.Y))
+                foreach (var desEl in GameObject.FindGameObjectsWithTag("Ball").Where(x => x.GetComponent<BallBehaviour>().Position.X == element.X && x.GetComponent<BallBehaviour>().Position.Y == element.Y))
                 {
                     GameObject.Destroy(desEl);
                 }
