@@ -3,7 +3,7 @@ using BallsLine.Implementation;
 using UnityEngine;
 
 
-public class GameState : MonoBehaviour {
+public class LevelBehaviour : MonoBehaviour {
 
     LevelState levelState;
 

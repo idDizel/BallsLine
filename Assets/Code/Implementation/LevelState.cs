@@ -15,6 +15,7 @@ namespace BallsLine.Implementation
         private LevelCore core;
         GameObject selectedBall;
         GameObject ballInstanse;
+        MonoBehaviour scoreContext;
 
         static LevelState()
         {
@@ -31,6 +32,14 @@ namespace BallsLine.Implementation
             get
             {
                 return instance;
+            }
+        }
+
+        public int Score
+        {
+            get
+            {
+                return this.core.Score;
             }
         }
 
@@ -63,6 +72,12 @@ namespace BallsLine.Implementation
             this.core = new LevelCore(7);
             this.core.OnPositionChanged += this.MoveBall;
             this.core.OnBallDelete += this.BallDelete;
+            this.core.OnScroeChanged += this.ScoreChanged;
+        }
+
+        private void ScoreChanged(object sender, EventArgs e)
+        {
+            this.scoreContext.guiText.text = string.Format("Score: {0}", this.core.Score);
         }
 
         public void MapPrefab(GameObject go, BallType type)
@@ -128,6 +143,11 @@ namespace BallsLine.Implementation
                     GameObject.Destroy(desEl);
                 }
             }
+        }
+
+        public void RegisterScoreContext(MonoBehaviour context)
+        {
+            this.scoreContext = context;
         }
     }
 }

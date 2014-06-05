@@ -16,9 +16,29 @@ namespace BallsLine.Implementation
         private int levelXSize;
         private int levelYSize;
 
+        private int score;
+
         public EventHandler<PositionEventArgs> OnPositionChanged;
         public EventHandler<PositionListEventArgs> OnBallDelete;
+        public EventHandler<EventArgs> OnScroeChanged;
 
+
+        public int Score
+        {
+            get
+            {
+                return this.score;
+            }
+
+            private set
+            {
+                this.score = value;
+                if (this.OnScroeChanged != null)
+                {
+                    this.OnScroeChanged(this, new EventArgs());
+                }
+            }
+        }
         public int LevelXSize
         {
             get
@@ -77,6 +97,7 @@ namespace BallsLine.Implementation
                 }
                 if (count == ballsCount || this.EmptyCellCount == 0) finish = true;
             } while (!finish);
+            if (this.EmptyCellCount == 0) Application.LoadLevel("Finish");
         }
 
         public bool ValidateOfAxis(Position position)
@@ -94,8 +115,16 @@ namespace BallsLine.Implementation
             var validY = axisArrayY.Where(val => val - Array.IndexOf(axisArrayY, val) == offsetY).Select(val => new Position(val, position.Y)).ToList();
 
             //To do: refactor constants
-            if (validX.Count >= 5) validList.AddRange(validX);
-            if (validY.Count >= 5) validList.AddRange(validY);
+            if (validX.Count >= 5) 
+            {
+                validList.AddRange(validX);
+                this.Score += 10;
+            }
+            if (validY.Count >= 5)
+            {
+                validList.AddRange(validY);
+                this.Score += 10;
+            }
 
             if (validList.Count > 0)
             {
