@@ -8,7 +8,7 @@ public class CellBehaviour : MonoBehaviour {
     public Position position;
 	// Use this for initialization
 	void Start () {
-	
+
 	}
 
     void OnMouseDown()

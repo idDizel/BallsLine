@@ -11,18 +11,25 @@ namespace BallsLine.Implementation
 {
     public class LevelCore: ILevelCore, IPrefabMapping
     {
-        private Dictionary<Position, BallType> LevelGrid;
-        private Dictionary<BallType, GameObject> mappedPrefabs;
+
+        #region Private Fields
         private int levelXSize;
         private int levelYSize;
-
         private int score;
+        private IElementNotifier selectedEelement;
+        private Dictionary<Position, ElementEntity> LevelGrid;
+        private Dictionary<BallType, IElementNotifier> mappedPrefabs;
+        private Func<Position, BallType, IElementNotifier> instantiator;
+        #endregion
 
+        #region Events
         public EventHandler<PositionEventArgs> OnPositionChanged;
         public EventHandler<PositionListEventArgs> OnBallDelete;
         public EventHandler<EventArgs> OnScroeChanged;
+        #endregion
 
 
+        #region Properties
         public int Score
         {
             get
@@ -39,6 +46,7 @@ namespace BallsLine.Implementation
                 }
             }
         }
+
         public int LevelXSize
         {
             get
@@ -71,16 +79,58 @@ namespace BallsLine.Implementation
             }
         }
 
+        //public IElementNotifier SelectedEelement 
+        //{
+        //    get
+        //    {
+        //        return this.selectedEelement;
+        //    }
+        //    set
+        //    {
+        //        if(value==null)
+        //        {
+        //            this.selectedEelement = value;
+        //            return;
+        //        }
+        //        if (this.selectedEelement != null)
+        //        {
+        //            if (this.selectedEelement.Position.X==value.Position.X && this.selectedEelement.Position.Y == value.Position.Y)
+        //            {
+        //                this.selectedEelement.Unselected();
+        //                this.selectedEelement = null;
+        //            }
+        //            else
+        //            {
+        //                this.selectedEelement.Unselected();
+        //                this.selectedEelement = value;
+        //                this.selectedEelement.Selected();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            this.selectedEelement = value;
+        //            this.selectedEelement.Selected();
+        //        }
+        //    }
+        //}
+        #endregion
+
         public LevelCore(int lvlSize)
         {
             this.levelXSize = lvlSize;
             this.levelYSize = lvlSize;
-            this.LevelGrid = new Dictionary<Position, BallType>();
-            this.mappedPrefabs = new Dictionary<BallType, GameObject>();
+            this.LevelGrid = new Dictionary<Position, ElementEntity>();
+            this.mappedPrefabs = new Dictionary<BallType, IElementNotifier>();
         }
 
-        public IEnumerable<BallEntity> GenerateBalls(int ballsCount)
+        private IElementNotifier Instantiator(Position position, BallType ballType)
         {
+            return instantiator.Invoke(position, ballType);
+        }
+
+        public void GenerateElements(int elementsCount)
+        {
+            
             int count = 0;
             bool finish = false;
             do
@@ -91,11 +141,12 @@ namespace BallsLine.Implementation
                 if(!this.LevelGrid.ContainsKey(position))
                 {
                     BallType ballType = (BallType)rnd.Next(1, Enum.GetValues(typeof(BallType)).Length);
-                    this.LevelGrid.Add(position, ballType);
+                    ElementEntity ee = new ElementEntity(ballType, this.Instantiator(position, ballType));
+                    this.LevelGrid.Add(position, ee);
                     count++;
-                    yield return new BallEntity(position, ballType);
+                    //yield return ee;
                 }
-                if (count == ballsCount || this.EmptyCellCount == 0) finish = true;
+                if (count == elementsCount || this.EmptyCellCount == 0) finish = true;
             } while (!finish);
             if (this.EmptyCellCount == 0) Application.LoadLevel("Finish");
         }
@@ -103,19 +154,19 @@ namespace BallsLine.Implementation
         public bool ValidateOfAxis(Position position)
         {
             List<Position> validList = new List<Position>();
-            BallType ballType;
-            this.LevelGrid.TryGetValue(position, out ballType);
+            ElementEntity element;
+            this.LevelGrid.TryGetValue(position, out element);
 
-            var axisArrayX = this.LevelGrid.Where(val => val.Key.X == position.X && val.Value == ballType).Select(val => val.Key.Y).OrderBy(val=>val).ToArray();
+            var axisArrayX = this.LevelGrid.Where(val => val.Key.X == position.X && val.Value.BallType == element.BallType).Select(val => val.Key.Y).OrderBy(val => val).ToArray();
             int offsetX = position.Y - Array.IndexOf(axisArrayX, position.Y);
             var validX = axisArrayX.Where(val => val - Array.IndexOf(axisArrayX, val) == offsetX).Select(val => new Position(position.X, val)).ToList();
 
-            var axisArrayY = this.LevelGrid.Where(val => val.Key.Y == position.Y && val.Value == ballType).Select(val => val.Key.X).OrderBy(val=>val).ToArray();
+            var axisArrayY = this.LevelGrid.Where(val => val.Key.Y == position.Y && val.Value.BallType == element.BallType).Select(val => val.Key.X).OrderBy(val => val).ToArray();
             int offsetY = position.X - Array.IndexOf(axisArrayY, position.X);
             var validY = axisArrayY.Where(val => val - Array.IndexOf(axisArrayY, val) == offsetY).Select(val => new Position(val, position.Y)).ToList();
 
             //To do: refactor constants
-            if (validX.Count >= 5) 
+            if (validX.Count >= 5)
             {
                 validList.AddRange(validX);
                 this.Score += 10;
@@ -138,27 +189,85 @@ namespace BallsLine.Implementation
             return false;
         }
 
-
-        public void ChangePosition(Position newPosition, Position prevPosition)
+        public void SelectElement(IElementNotifier element)
         {
-            BallType prevBallType;
-            this.LevelGrid.TryGetValue(prevPosition, out prevBallType);
-            if(!this.LevelGrid.ContainsKey(newPosition))
+            if(this.selectedEelement != null)
             {
-                this.LevelGrid.Add(newPosition, prevBallType);
-                this.LevelGrid.Remove(prevPosition);
-                this.OnPositionChanged(this, new PositionEventArgs(newPosition));
+                if (this.selectedEelement.Position.Equals(element.Position))
+                {
+                    this.selectedEelement.Unselected();
+                    this.selectedEelement = null;
+                }
+                else
+                {
+                    this.selectedEelement.Unselected();
+                    this.selectedEelement = element;
+                    this.selectedEelement.Selected();
+                }
+            }
+            else
+            {
+                this.selectedEelement = element;
+                this.selectedEelement.Selected();
             }
         }
 
-        public void MapPrefab(GameObject gameObject, BallType type)
+        public void ChangePosition(Position newPosition)
+        {
+            //BallType prevBallType;
+            //this.LevelGrid.TryGetValue(prevPosition, out prevBallType);
+            //if (this.selectedEelement.Position.X == newPosition.X && this.selectedEelement.Position.Y == newPosition.Y) ;
+            //{
+            //    this.selectedEelement.Unselected();
+            //    this.selectedEelement = null;
+            //    return;
+            //}
+            
+            if(this.selectedEelement == null)
+            {
+                return;
+            }
+            if (this.selectedEelement.Position.Equals(newPosition))
+            {
+                this.selectedEelement.Unselected();
+                this.selectedEelement = null;
+                return;
+            }
+            ElementEntity ee;
+            this.LevelGrid.TryGetValue(this.selectedEelement.Position, out ee);
+            if (!this.LevelGrid.ContainsKey(newPosition))
+            {
+                this.LevelGrid.Remove(this.selectedEelement.Position);
+                this.selectedEelement.Position = newPosition;
+                this.LevelGrid.Add(newPosition, ee);
+                this.selectedEelement.PositionChanged();
+                if (!this.ValidateOfAxis(this.selectedEelement.Position))
+                {
+                    this.GenerateElements(3);
+                }
+                this.selectedEelement = null;
+                //this.OnPositionChanged(this, new PositionEventArgs(newPosition));
+            }
+        }
+
+        public void RegisterInstantiator(Func<Position, BallType, IElementNotifier> method)
+        {
+            this.instantiator = method;
+        }
+
+        public void MapPrefab(IElementNotifier gameObject, BallType type)
         {
             this.mappedPrefabs.Add(type, gameObject);
         }
 
-        public void GetBallByType(BallType type, out GameObject gameObject)
+        public void GetBallByType(BallType type, out IElementNotifier gameObject)
         {
             this.mappedPrefabs.TryGetValue(type, out gameObject);
+        }
+
+        internal void RegisterInstantiator()
+        {
+            throw new NotImplementedException();
         }
     }
 }

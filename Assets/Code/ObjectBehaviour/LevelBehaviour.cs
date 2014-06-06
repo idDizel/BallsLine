@@ -1,5 +1,6 @@
 ﻿using BallsLine.Enums;
 using BallsLine.Implementation;
+using BallsLine.Interfaces;
 using UnityEngine;
 
 
@@ -7,12 +8,12 @@ public class LevelBehaviour : MonoBehaviour {
 
     LevelState levelState;
 
-    public GameObject RedBall;
-    public GameObject GreenBall;
-    public GameObject YellowBall;
-    public GameObject BlueBall;
-    public GameObject PurpleBall;
-    public GameObject OrangeBall;
+    public MonoBehaviour RedBall;
+    public MonoBehaviour GreenBall;
+    public MonoBehaviour YellowBall;
+    public MonoBehaviour BlueBall;
+    public MonoBehaviour PurpleBall;
+    public MonoBehaviour OrangeBall;
     public GameObject Cell;
 
     private GameObject Ball;
@@ -23,12 +24,12 @@ public class LevelBehaviour : MonoBehaviour {
         this.levelState.GenerateLevel();
         this.levelState.GenerateCells(Cell);
         
-        this.levelState.MapPrefab(RedBall, BallType.Red);
-        this.levelState.MapPrefab(BlueBall, BallType.Blue);
-        this.levelState.MapPrefab(GreenBall, BallType.Green);
-        this.levelState.MapPrefab(YellowBall, BallType.Yellow);
-        this.levelState.MapPrefab(OrangeBall, BallType.Orange);
-        this.levelState.MapPrefab(PurpleBall, BallType.Purple);
+        this.levelState.MapPrefab((IElementNotifier)RedBall, BallType.Red);
+        this.levelState.MapPrefab((IElementNotifier)BlueBall, BallType.Blue);
+        this.levelState.MapPrefab((IElementNotifier)GreenBall, BallType.Green);
+        this.levelState.MapPrefab((IElementNotifier)YellowBall, BallType.Yellow);
+        this.levelState.MapPrefab((IElementNotifier)OrangeBall, BallType.Orange);
+        this.levelState.MapPrefab((IElementNotifier)PurpleBall, BallType.Purple);
 
         this.levelState.GenerateBalls();
 	}

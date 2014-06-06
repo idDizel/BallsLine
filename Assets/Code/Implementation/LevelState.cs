@@ -1,6 +1,7 @@
 ﻿using BallsLine.Code.Implementation;
 using BallsLine.Entities;
 using BallsLine.Enums;
+using BallsLine.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,8 @@ namespace BallsLine.Implementation
     {
         private static readonly LevelState instance = new LevelState();
         private LevelCore core;
-        GameObject selectedBall;
-        GameObject ballInstanse;
+        //IElementNotifier selectedBall;
+        IElementNotifier ballInstanse;
         MonoBehaviour scoreContext;
 
         static LevelState()
@@ -26,6 +27,18 @@ namespace BallsLine.Implementation
         {
             
         }
+
+        //public IElementNotifier SelectedElement
+        //{
+        //    get
+        //    {
+        //        return this.core.SelectedEelement;
+        //    }
+        //    set
+        //    {
+        //        this.core.SelectedEelement = value;
+        //    }
+        //}
 
         public static LevelState Instance
         {
@@ -50,29 +63,38 @@ namespace BallsLine.Implementation
                 for (int y = 0; y < this.core.LevelYSize; y++)
                 {
                     GameObject newCell = (GameObject)GameObject.Instantiate(cellInstance, new Vector3(x * 1.1f, y * 1.1f, 0), Quaternion.identity);
-                    newCell.GetComponent<CellBehaviour>().position.X = x;
-                    newCell.GetComponent<CellBehaviour>().position.Y = y;
+                    newCell.GetComponent<CellBehaviour>().position = new Position(x, y);
                 }
             }
         }
 
         public void GenerateBalls()
         {
-            foreach (var ball in core.GenerateBalls(3))
-            {
-                this.core.GetBallByType(ball.BallType, out ballInstanse);
-                var newBall = (GameObject)GameObject.Instantiate(ballInstanse, new Vector3(ball.BallPosition.X * 1.1f, ball.BallPosition.Y * 1.1f, -1), Quaternion.identity);
-                newBall.GetComponent<BallBehaviour>().Position.X = ball.BallPosition.X;
-                newBall.GetComponent<BallBehaviour>().Position.Y = ball.BallPosition.Y;
-            }
+            core.GenerateElements(3);
+            //foreach (var ball in core.GenerateElements(3))
+            //{
+            //    this.core.GetBallByType(ball.BallType, out ballInstanse);
+            //    var newBall = (GameObject)GameObject.Instantiate(ballInstanse, new Vector3(ball.BallPosition.X * 1.1f, ball.BallPosition.Y * 1.1f, -1), Quaternion.identity);
+            //    newBall.GetComponent<BallBehaviour>().Position.X = ball.BallPosition.X;
+            //    newBall.GetComponent<BallBehaviour>().Position.Y = ball.BallPosition.Y;
+            //}
         }
 
         public void GenerateLevel()
         {
             this.core = new LevelCore(7);
-            this.core.OnPositionChanged += this.MoveBall;
+            this.core.RegisterInstantiator(this.Inst);
+            //this.core.OnPositionChanged += this.MoveBall;
             this.core.OnBallDelete += this.BallDelete;
             this.core.OnScroeChanged += this.ScoreChanged;
+        }
+
+        private IElementNotifier Inst(Position position, BallType ballType)
+        {
+            this.core.GetBallByType(ballType, out ballInstanse);
+            var ee = (IElementNotifier)GameObject.Instantiate((MonoBehaviour)ballInstanse, new Vector3(position.X * 1.1f, position.Y * 1.1f, -1), Quaternion.identity);
+            ee.Position = position;
+            return ee;
         }
 
         private void ScoreChanged(object sender, EventArgs e)
@@ -80,59 +102,59 @@ namespace BallsLine.Implementation
             this.scoreContext.guiText.text = string.Format("Score: {0}", this.core.Score);
         }
 
-        public void MapPrefab(GameObject go, BallType type)
+        public void MapPrefab(IElementNotifier go, BallType type)
         {
             this.core.MapPrefab(go, type);
         }
 
-        public void GetBallByType(BallType type, out GameObject gameObject)
+        public void GetBallByType(BallType type, out IElementNotifier gameObject)
         {
             this.core.GetBallByType(type, out gameObject);
         }
 
-        public void SelectBall(GameObject selectedBall)
+        public void SelectElement(IElementNotifier element)
         {
-            if (this.selectedBall != null)
-            {
-                if (this.selectedBall.Equals(selectedBall.gameObject))
-                {
-                    this.selectedBall.transform.Translate(0, 0, 1.0f);
-                    this.selectedBall = null;
-                }
-                else
-                {
-                    this.selectedBall.transform.Translate(0, 0, 1.0f);
-                    this.selectedBall = selectedBall.gameObject;
-                    this.selectedBall.transform.Translate(new Vector3(0, 0, -1.0f));
-                }
-            }
-            else
-            {
-                this.selectedBall = selectedBall.gameObject;
-                this.selectedBall.transform.Translate(new Vector3(0, 0, -1.0f));
-            }
+            this.core.SelectElement(element);
         }
+
+        //public void SelectBall(IElementNotifier selectedBall)
+        //{
+        //    if (this.selectedBall != null)
+        //    {
+        //        if (this.selectedBall.Equals(selectedBall))
+        //        {
+        //            this.selectedBall.Unselected();
+        //            this.selectedBall = null;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        this.selectedBall = selectedBall;
+        //        this.selectedBall.Selected();
+        //    }
+        //}
 
         public void ChangePosition(Position newPosition)
         {
-            if(this.selectedBall!=null)
-            {
-                Position prevPosition = this.selectedBall.GetComponent<BallBehaviour>().Position;
-                this.core.ChangePosition(newPosition, prevPosition);
-            }
+            //if (this.SelectedElement != null)
+            //{
+                this.core.ChangePosition(newPosition);
+            //    this.SelectedElement = null;
+            //}
+            
         }
 
-        public void MoveBall(object sender, PositionEventArgs args)
-        {
-            this.selectedBall.transform.position = new Vector3(args.position.X * 1.1f, args.position.Y * 1.1f, -1);
-            this.selectedBall.GetComponent<BallBehaviour>().Position.X = args.position.X;
-            this.selectedBall.GetComponent<BallBehaviour>().Position.Y = args.position.Y;
-            if(!this.core.ValidateOfAxis(new Position(args.position.X, args.position.Y)))
-            {
-                this.GenerateBalls();
-            }
-            this.selectedBall = null;
-        }
+        //public void MoveBall(object sender, PositionEventArgs args)
+        //{
+        //    this.selectedBall.transform.position = new Vector3(args.position.X * 1.1f, args.position.Y * 1.1f, -1);
+        //    this.selectedBall.GetComponent<BallBehaviour>().Position.X = args.position.X;
+        //    this.selectedBall.GetComponent<BallBehaviour>().Position.Y = args.position.Y;
+        //    if(!this.core.ValidateOfAxis(new Position(args.position.X, args.position.Y)))
+        //    {
+        //        this.GenerateBalls();
+        //    }
+        //    this.selectedBall = null;
+        //}
 
         private void BallDelete(object sender, PositionListEventArgs args)
         {

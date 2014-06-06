@@ -9,8 +9,8 @@ namespace BallsLine.Interfaces
 {
     public interface ILevelCore
     {
-        IEnumerable<BallEntity> GenerateBalls(int ballsCount);
-        bool ValidateOfAxis(Position position);
-        void ChangePosition(Position newPosition, Position prevPosition);
+        void GenerateElements(int ballsCount);
+        //bool ValidateOfAxis(Position position);
+        //void ChangePosition(Position newPosition, Position prevPosition);
     }
 }
