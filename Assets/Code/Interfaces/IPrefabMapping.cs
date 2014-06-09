@@ -5,7 +5,7 @@ namespace BallsLine.Interfaces
 {
     public interface IPrefabMapping
     {
-        void MapPrefab(IElementNotifier gameObject, BallType type);
+        void MapPrefab(IElementNotifier gameObject, ElementType type);
 
     }
 }

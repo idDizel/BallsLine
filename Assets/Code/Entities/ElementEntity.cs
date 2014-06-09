@@ -6,12 +6,12 @@ namespace BallsLine.Entities
 {
     public class ElementEntity
     {
-        public ElementEntity(BallType ballType, IElementNotifier instance)
+        public ElementEntity(ElementType ballType, IElementNotifier instance)
         {
             this.BallType = ballType;
             this.Instance = instance;
         }
-        public BallType BallType { get; set; }
+        public ElementType BallType { get; set; }
         public IElementNotifier Instance { get; set; }
     }
 }

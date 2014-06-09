@@ -24,12 +24,12 @@ public class LevelBehaviour : MonoBehaviour {
         this.levelState.GenerateLevel();
         this.levelState.GenerateCells(Cell);
         
-        this.levelState.MapPrefab((IElementNotifier)RedBall, BallType.Red);
-        this.levelState.MapPrefab((IElementNotifier)BlueBall, BallType.Blue);
-        this.levelState.MapPrefab((IElementNotifier)GreenBall, BallType.Green);
-        this.levelState.MapPrefab((IElementNotifier)YellowBall, BallType.Yellow);
-        this.levelState.MapPrefab((IElementNotifier)OrangeBall, BallType.Orange);
-        this.levelState.MapPrefab((IElementNotifier)PurpleBall, BallType.Purple);
+        this.levelState.MapPrefab((IElementNotifier)RedBall, ElementType.Red);
+        this.levelState.MapPrefab((IElementNotifier)BlueBall, ElementType.Blue);
+        this.levelState.MapPrefab((IElementNotifier)GreenBall, ElementType.Green);
+        this.levelState.MapPrefab((IElementNotifier)YellowBall, ElementType.Yellow);
+        this.levelState.MapPrefab((IElementNotifier)OrangeBall, ElementType.Orange);
+        this.levelState.MapPrefab((IElementNotifier)PurpleBall, ElementType.Purple);
 
         this.levelState.GenerateBalls();
 	}

@@ -9,7 +9,7 @@ namespace BallsLine.Interfaces
 {
     public interface ILevelCore
     {
-        void GenerateElements(int ballsCount);
+        //void GenerateElements(int ballsCount);
         //bool ValidateOfAxis(Position position);
         //void ChangePosition(Position newPosition, Position prevPosition);
     }

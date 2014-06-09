@@ -1,6 +1,6 @@
 ﻿namespace BallsLine.Enums
 {
-    public enum BallType
+    public enum ElementType
     {
         Empty = 0,
         Red,

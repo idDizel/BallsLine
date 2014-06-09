@@ -89,10 +89,11 @@ namespace BallsLine.Implementation
             this.core.OnScroeChanged += this.ScoreChanged;
         }
 
-        private IElementNotifier Inst(Position position, BallType ballType)
+        private IElementNotifier Inst(Position position, ElementType ballType)
         {
             this.core.GetBallByType(ballType, out ballInstanse);
             var ee = (IElementNotifier)GameObject.Instantiate((MonoBehaviour)ballInstanse, new Vector3(position.X * 1.1f, position.Y * 1.1f, -1), Quaternion.identity);
+            ee.Type = ballType;
             ee.Position = position;
             return ee;
         }
@@ -102,12 +103,12 @@ namespace BallsLine.Implementation
             this.scoreContext.guiText.text = string.Format("Score: {0}", this.core.Score);
         }
 
-        public void MapPrefab(IElementNotifier go, BallType type)
+        public void MapPrefab(IElementNotifier go, ElementType type)
         {
             this.core.MapPrefab(go, type);
         }
 
-        public void GetBallByType(BallType type, out IElementNotifier gameObject)
+        public void GetBallByType(ElementType type, out IElementNotifier gameObject)
         {
             this.core.GetBallByType(type, out gameObject);
         }

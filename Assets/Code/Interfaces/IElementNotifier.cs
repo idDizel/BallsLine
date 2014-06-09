@@ -1,4 +1,5 @@
 ﻿using BallsLine.Entities;
+using BallsLine.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,9 @@ using System.Text;
 
 namespace BallsLine.Interfaces
 {
-    public interface IElementNotifier
+    public interface IElementNotifier: INotifier
     {
         Position Position { get; set; }
-        void Selected();
-        void Unselected();
-        void PositionChanged();
-        void Removed();
+        ElementType Type { get; set; }
     }
 }

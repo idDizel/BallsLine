@@ -17,9 +17,10 @@ namespace BallsLine.Implementation
         private int levelYSize;
         private int score;
         private IElementNotifier selectedEelement;
-        private Dictionary<Position, ElementEntity> LevelGrid;
-        private Dictionary<BallType, IElementNotifier> mappedPrefabs;
-        private Func<Position, BallType, IElementNotifier> instantiator;
+        private Dictionary<Position, IElementNotifier> LevelGrid;
+        private Dictionary<ElementType, IElementNotifier> mappedPrefabs;
+        private Func<Position, ElementType, IElementNotifier> instantiator;
+
         #endregion
 
         #region Events
@@ -119,18 +120,17 @@ namespace BallsLine.Implementation
         {
             this.levelXSize = lvlSize;
             this.levelYSize = lvlSize;
-            this.LevelGrid = new Dictionary<Position, ElementEntity>();
-            this.mappedPrefabs = new Dictionary<BallType, IElementNotifier>();
+            this.LevelGrid = new Dictionary<Position, IElementNotifier>();
+            this.mappedPrefabs = new Dictionary<ElementType, IElementNotifier>();
         }
 
-        private IElementNotifier Instantiator(Position position, BallType ballType)
+        private IElementNotifier Instantiator(Position position, ElementType ballType)
         {
             return instantiator.Invoke(position, ballType);
         }
 
         public void GenerateElements(int elementsCount)
         {
-            
             int count = 0;
             bool finish = false;
             do
@@ -140,8 +140,9 @@ namespace BallsLine.Implementation
                 Position position = new Position(rnd.Next(0, this.levelXSize), rnd.Next(0, this.levelYSize));
                 if(!this.LevelGrid.ContainsKey(position))
                 {
-                    BallType ballType = (BallType)rnd.Next(1, Enum.GetValues(typeof(BallType)).Length);
-                    ElementEntity ee = new ElementEntity(ballType, this.Instantiator(position, ballType));
+                    ElementType ballType = (ElementType)rnd.Next(1, Enum.GetValues(typeof(ElementType)).Length);
+                    IElementNotifier ee = this.Instantiator(position, ballType);
+                    ee.Added();
                     this.LevelGrid.Add(position, ee);
                     count++;
                     //yield return ee;
@@ -154,14 +155,14 @@ namespace BallsLine.Implementation
         public bool ValidateOfAxis(Position position)
         {
             List<Position> validList = new List<Position>();
-            ElementEntity element;
+            IElementNotifier element;
             this.LevelGrid.TryGetValue(position, out element);
 
-            var axisArrayX = this.LevelGrid.Where(val => val.Key.X == position.X && val.Value.BallType == element.BallType).Select(val => val.Key.Y).OrderBy(val => val).ToArray();
+            var axisArrayX = this.LevelGrid.Where(val => val.Key.X == position.X && val.Value.Type == element.Type).Select(val => val.Key.Y).OrderBy(val => val).ToArray();
             int offsetX = position.Y - Array.IndexOf(axisArrayX, position.Y);
             var validX = axisArrayX.Where(val => val - Array.IndexOf(axisArrayX, val) == offsetX).Select(val => new Position(position.X, val)).ToList();
 
-            var axisArrayY = this.LevelGrid.Where(val => val.Key.Y == position.Y && val.Value.BallType == element.BallType).Select(val => val.Key.X).OrderBy(val => val).ToArray();
+            var axisArrayY = this.LevelGrid.Where(val => val.Key.Y == position.Y && val.Value.Type == element.Type).Select(val => val.Key.X).OrderBy(val => val).ToArray();
             int offsetY = position.X - Array.IndexOf(axisArrayY, position.X);
             var validY = axisArrayY.Where(val => val - Array.IndexOf(axisArrayY, val) == offsetY).Select(val => new Position(val, position.Y)).ToList();
 
@@ -183,6 +184,7 @@ namespace BallsLine.Implementation
                 foreach (var delBall in validList.Distinct())
                 {
                     this.LevelGrid.Remove(delBall);
+                    
                 }
                 return true;
             }
@@ -233,7 +235,7 @@ namespace BallsLine.Implementation
                 this.selectedEelement = null;
                 return;
             }
-            ElementEntity ee;
+            IElementNotifier ee;
             this.LevelGrid.TryGetValue(this.selectedEelement.Position, out ee);
             if (!this.LevelGrid.ContainsKey(newPosition))
             {
@@ -250,17 +252,17 @@ namespace BallsLine.Implementation
             }
         }
 
-        public void RegisterInstantiator(Func<Position, BallType, IElementNotifier> method)
+        public void RegisterInstantiator(Func<Position, ElementType, IElementNotifier> method)
         {
             this.instantiator = method;
         }
 
-        public void MapPrefab(IElementNotifier gameObject, BallType type)
+        public void MapPrefab(IElementNotifier gameObject, ElementType type)
         {
             this.mappedPrefabs.Add(type, gameObject);
         }
 
-        public void GetBallByType(BallType type, out IElementNotifier gameObject)
+        public void GetBallByType(ElementType type, out IElementNotifier gameObject)
         {
             this.mappedPrefabs.TryGetValue(type, out gameObject);
         }

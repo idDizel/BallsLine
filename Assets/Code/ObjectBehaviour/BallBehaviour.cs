@@ -8,7 +8,7 @@ public class BallBehaviour : MonoBehaviour, IElementNotifier
     public Position Position{get; set;}
 	// Use this for initialization
 	void Start () {
-	
+	    
 	}
 	
     void OnMouseDown()
@@ -35,5 +35,14 @@ public class BallBehaviour : MonoBehaviour, IElementNotifier
     public void Removed()
     {
         throw new System.NotImplementedException();
+    }
+
+
+    public BallsLine.Enums.ElementType Type { get; set; }
+
+
+    public void Added()
+    {
+
     }
 }
