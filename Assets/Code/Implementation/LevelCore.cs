@@ -129,6 +129,13 @@ namespace BallsLine.Implementation
             return instantiator.Invoke(position, ballType);
         }
 
+        public void Generate(IGeneratorStrategy generator)
+        {
+            IEnumerable<IElement> elements = generator.Generate();
+            IEnumerable<IElementNotifier> instances = generator.Instantiate(elements);
+            generator.Save(instances);
+        }
+
         public void GenerateElements(int elementsCount)
         {
             int count = 0;
